@@ -13,9 +13,10 @@ class Delivery(Agent):
 
 class Box(Agent):
     # Cajas a recolectar.
-    def __init__(self, unique_id, model, delivery_pos):
+    def __init__(self, unique_id, pos, delivery_pos, model):
         super().__init__(unique_id, model)
         self.unique_id = unique_id
+        self.pos = pos
         self.delivery_pos = delivery_pos
         self.state = False
     
@@ -36,7 +37,7 @@ class Box(Agent):
 class Collector(Agent):
     # Persona que recojera cajas.
     def __init__(self, unique_id, pos, delivery_pos, model):
-        super().__init__(unique_id, pos, model)
+        super().__init__(unique_id, model)
         self.unique_id = unique_id
         self.pos = pos
         self.delivery_pos = delivery_pos
@@ -44,38 +45,39 @@ class Collector(Agent):
         self.impossible_steps = set()
     
     def move(self, next_pos):
-        print("Move Collector", self.unique_id, "to:", next_pos)
+        #print("Move Collector", self.unique_id, "to:", next_pos)
         self.model.grid.move_agent(self, next_pos) # Checar con servidor
 
     def step(self):
-        possible_steps = self.model.grid.get_neighborhood(
+        steps = self.model.grid.get_neighborhood(
             self.pos,
             moore=False,
             include_center=False)
         possible_box = []
+        possible_steps = []
 
         # check for obstacles
-        for i in range(len(possible_steps)):
-            cell = self.model.grid.get_cell_list_contents([possible_steps[i]])
-            if (cell > 0):
-                if (isinstance(cell[0], Collector)):
-                    possible_steps.pop(i)
-                elif(isinstance(cell[0], Box)):
-                    possible_box.append(possible_steps.pop(i))
+        for i in range(len(steps)):
+            cell = self.model.grid.get_cell_list_contents([steps[i]])
+            if (len(cell) == 0):
+                possible_steps.append(steps[i])
+            elif(isinstance(cell[0], Box)):
+                possible_box.append(steps[i])
         
         # Comunication (Tentativo)
         
         # Drop box.
-        for pos in possible_steps:
+        for pos in steps:
             cell = self.model.grid.get_cell_list_contents(pos)
-            if (isinstance(cell[0], Delivery)):
+            if (self.box != -1 and len(cell) > 0 and isinstance(cell[0], Delivery)):
+                print(f"Collector {self.unique_id} drop in delivery box {self.box.unique_id}")
                 self.box.move(pos)
                 self.box = -1
                 pass
 
         # Go to delivery
         if (self.box != -1):
-            possible_steps = list(set(possible_steps) / self.impossible_steps)
+            possible_steps = list(set(possible_steps) - self.impossible_steps)
             min_step = possible_steps[0]
             min_dist = self.getDistance(min_step)
             for step in possible_steps:
@@ -92,13 +94,13 @@ class Collector(Agent):
         elif (len(possible_box)):
             cell = self.model.grid.get_cell_list_contents([possible_box[0]])[0]
             self.box = cell
-            cell.pos = self.pos
             cell.take_box()
+            self.box.move(self.pos)
         
         # Move randomly
         else:
             direction = self.random.randint(0,len(possible_steps)-1)
-            self.move(direction)
+            self.move(possible_steps[direction])
 
     def getDistance(self, dest):
         return ((dest[0]-self.delivery_pos[0])**2+(dest[1]-self.delivery_pos[1])**2)**(1/2)

@@ -14,6 +14,8 @@ class CollectorsModel(Model):
         # Add Delivery to a random empty grid cell
         delivery_pos = pos_gen(self.grid.width, self.grid.height)
         a = Delivery(delivery_pos, self)
+        self.schedule.add(a)
+        self.grid.place_agent(a, delivery_pos)
         
         # Add the agent to a random empty grid cell
         for i in range(self.num_agents):
