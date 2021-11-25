@@ -147,7 +147,7 @@ public class AgentController : MonoBehaviour
             Debug.Log(www.downloadHandler.text);
             // Extract the response into an instance of an object
             agents = JsonUtility.FromJson<Agents>(www.downloadHandler.text);
-            // MoveAgents();
+            MoveAgents();
         }
         else
         {
@@ -155,11 +155,15 @@ public class AgentController : MonoBehaviour
         }
     }
 
-    // void MoveAgents()
-    // {
-    //     for (int i = 0; i < numAgents; i++)
-    //     {
-    //         cars[i].transform.position = agents.positions[i];
-    //     }
-    // }
+    void MoveAgents()
+    {
+        for (int i = 0; i < numRovers; i++)
+        {
+            rover[i].transform.position = agents.collectorsPositions[i];
+        }
+        for (int i = 0; i < numBoxes; i++)
+        {
+            rover[i].transform.position = agents.boxesPositions[i];
+        }
+    }
 }
