@@ -13,10 +13,10 @@ class CollectorsModel(Model):
         
         pos_gen = lambda w, h: (self.random.randrange(w), self.random.randrange(h))
         # Add Delivery to a random empty grid cell
-        delivery_pos = pos_gen(self.grid.width, self.grid.height)
-        a = Delivery(delivery_pos, self)
+        self.delivery_pos = pos_gen(self.grid.width, self.grid.height)
+        a = Delivery(self.delivery_pos, self)
         self.schedule.add(a)
-        self.grid.place_agent(a, delivery_pos)
+        self.grid.place_agent(a, self.delivery_pos)
         
         # Add the agent to a random empty grid cell
         for i in range(self.num_agents):
@@ -24,7 +24,7 @@ class CollectorsModel(Model):
             while (not self.grid.is_cell_empty(pos)):
                 pos = pos_gen(self.grid.width, self.grid.height)
 
-            a = Collector(i+1000, pos, delivery_pos, self) 
+            a = Collector(i+1000, pos, self.delivery_pos, self) 
             self.schedule.add(a)
             self.grid.place_agent(a, pos)
         
@@ -35,7 +35,7 @@ class CollectorsModel(Model):
             while (not self.grid.is_cell_empty(pos)):
                 pos = pos_gen(self.grid.width, self.grid.height)
 
-            a = Box(i+2000, pos, delivery_pos, self) 
+            a = Box(i+2000, pos, self.delivery_pos, self) 
             self.schedule.add(a)
             self.grid.place_agent(a, pos)
     

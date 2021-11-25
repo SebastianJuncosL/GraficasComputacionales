@@ -27,6 +27,14 @@ def default():
         model = CollectorsModel(num_rovers, num_boxes, height, width)
 
 
+@app.route("/getDelivery", methods=['GET'])
+def getDelivery():
+    global model
+
+    if request.method == ' GET':
+        return jsonify({'deliveryPos': model.delivery_pos})
+
+
 @app.route("/config", methods=['GET'])
 def configure():
     """Set up the simulation"""
@@ -38,13 +46,14 @@ def configure():
         collecors_pos = [{"x": x, "y": 0, "z": z} for (
             a, x, z) in model.grid.coord_iter() if isinstance(a, Collector)]
 
-        return jsonify({'boxes positions': boxes_pos, 'collectos positions': collecors_pos})
+        return jsonify({'boxesPositions': boxes_pos, 'collectorsPositions': collecors_pos})
 
 
 @app.route("/update", methods=['GET'])
 def update_position():
     """Create a list of 3d Points"""
     global model
+
     if request.method == ' GET':
         model.step()
         return jsonify({'message': 'Model updated'})
