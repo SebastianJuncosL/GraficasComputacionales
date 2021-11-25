@@ -32,8 +32,7 @@ def default():
 def getDelivery():
     global model
 
-    if request.method == ' GET':
-        return jsonify({'deliveryPos': model.delivery_pos})
+    return jsonify({'deliveryPos': model.delivery_pos})
 
 
 @app.route("/UpdatePositions", methods=['GET'])
@@ -41,7 +40,7 @@ def configure():
     """Set up the simulation"""
     global model
 
-    if request.method == ' GET':
+    if request.method == 'GET':
         boxes_pos = [{"x": x, "y": 0, "z": z}
                      for (a, x, z) in model.grid.coord_iter() if isinstance(a, Box)]
         collecors_pos = [{"x": x, "y": 0, "z": z} for (
@@ -55,7 +54,7 @@ def update_position():
     """Create a list of 3d Points"""
     global model
 
-    if request.method == ' GET':
+    if request.method == 'GET':
         model.step()
         return jsonify({'message': 'Model updated'})
 

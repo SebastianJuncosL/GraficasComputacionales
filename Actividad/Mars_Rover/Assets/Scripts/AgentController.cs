@@ -16,7 +16,7 @@ public class Position
 
 public class AgentController : MonoBehaviour
 {
-    string url = "http://localhost:8585";
+    string url = "http://127.0.0.1:8585";
     string initEp = "/init";
     string positionEp = "/UpdatePositions";
     string modelEp = "/updateModel";
@@ -95,7 +95,7 @@ public class AgentController : MonoBehaviour
         form.AddField("numRovers", numRovers.ToString());
         form.AddField("numBoxes", numBoxes.ToString());
         form.AddField("width", floorWidth.ToString());
-        form.AddField("hight", floorHeight.ToString());
+        form.AddField("height", floorHeight.ToString());
 
         UnityWebRequest www = UnityWebRequest.Post(url + initEp, form);
         yield return www.SendWebRequest();
