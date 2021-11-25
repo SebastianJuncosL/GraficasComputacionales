@@ -73,6 +73,7 @@ class Collector(Agent):
                 print(f"Collector {self.unique_id} drop in delivery box {self.box.unique_id}")
                 self.box.move(pos)
                 self.box = -1
+                self.impossible_steps = set()
                 pass
 
         # Go to delivery

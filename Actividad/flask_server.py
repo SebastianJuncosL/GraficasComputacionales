@@ -1,42 +1,54 @@
 from flask import Flask, request, jsonify
-from random import uniform
+from model import *
 
 # Create the flask service
-app = Flask("Coordinate server")
 
-num_agents = 0
-limit = 10
+num_rovers = 0
+num_boxes = 0
 
+width = 10
+height = 10
+model = None
 
-def random_point():
-    """Generate a new 3D coordinate"""
-    return {"x": uniform(-limit, limit),
-            "y": uniform(-limit, limit),
-            "z": uniform(-limit, limit)}
+app = Flask("Collectors")
 
 
-@app.route("/")
+@app.route("/init", methods=['POST'])
 def default():
-    """Test function for flask"""
-    print("Recived a request at /")
-    return "This is working"
+    global num_rovers, num_boxes, height, width, model
+
+    if request.method == 'POST':
+        num_rovers = int(request.form.get('numRovers'))
+        num_boxes = int(request.form.get('numBoxes'))
+        width = int(request.form.get('width'))
+        height = int(request.form.get('height'))
+
+        print(request.form)
+        model = CollectorsModel(num_rovers, num_boxes, height, width)
 
 
-@app.route("/config", methods=['POST'])
+@app.route("/config", methods=['GET'])
 def configure():
     """Set up the simulation"""
-    global num_agents
-    num_agents = int(request.form.get("numAgents"))
-    print(f"Recived num_agents = {num_agents}")
-    return jsonify({"OK": num_agents})
+    global model
+
+    if request.method == ' GET':
+        boxes_pos = [{"x": x, "y": 0, "z": z}
+                     for (a, x, z) in model.grid.coord_iter() if isinstance(a, Box)]
+        collecors_pos = [{"x": x, "y": 0, "z": z} for (
+            a, x, z) in model.grid.coord_iter() if isinstance(a, Collector)]
+
+        return jsonify({'boxes positions': boxes_pos, 'collectos positions': collecors_pos})
 
 
 @app.route("/update", methods=['GET'])
 def update_position():
     """Create a list of 3d Points"""
-    points = [random_point() for _ in range(num_agents)]
-    print(f"Positions: {points}")
-    return jsonify({"positions": points})
+    global model
+    if request.method == ' GET':
+        model.step()
+        return jsonify({'message': 'Model updated'})
 
 
-app.run()
+if __name__ == '__main__':
+    app.run(host="localhost", port=8585, debug=True)

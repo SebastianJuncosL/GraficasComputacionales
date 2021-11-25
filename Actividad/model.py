@@ -9,6 +9,7 @@ class CollectorsModel(Model):
         self.grid = MultiGrid(width, height, torus = False) 
         self.schedule = SimultaneousActivation(self)
         self.running = True 
+        self.num_steps = 0
         
         pos_gen = lambda w, h: (self.random.randrange(w), self.random.randrange(h))
         # Add Delivery to a random empty grid cell
@@ -40,3 +41,5 @@ class CollectorsModel(Model):
     
     def step(self):
         self.schedule.step()
+        self.num_steps += 1
+
