@@ -11,18 +11,17 @@ public class Agents
 
 public class Position
 {
-    Vector3 deliveryPos;
+    public Vector3 deliveryPos;
 }
 
 public class AgentController : MonoBehaviour
 {
     string url = "http://localhost:8585";
     string initEp = "/init";
-    string configEp = "/config";
-    string updateEp = "/update";
+    string positionEp = "/UpdatePositions";
+    string modelEp = "/updateModel";
     [SerializeField] int numRovers;
     [SerializeField] int numBoxes;
-    int numPlatform = 1;
     [SerializeField] GameObject roverPrefab;
     [SerializeField] GameObject boxPrefab;
     [SerializeField] GameObject platformPrefab;
@@ -63,7 +62,8 @@ public class AgentController : MonoBehaviour
 
 
         StartCoroutine(sendConfiguration());
-        StartCoroutine()
+        StartCoroutine(setDelivery());
+        StartCoroutine(UpdatePositions());
     }
 
     // Update is called once per frame
@@ -71,6 +71,7 @@ public class AgentController : MonoBehaviour
     {
         if (updateTime > updateDelay)
         {
+            StartCoroutine(UpdateModel());
             StartCoroutine(UpdatePositions());
             updateTime = 0;
         }
@@ -92,8 +93,11 @@ public class AgentController : MonoBehaviour
     {
         WWWForm form = new WWWForm();
         form.AddField("numRovers", numRovers.ToString());
+        form.AddField("numBoxes", numBoxes.ToString());
+        form.AddField("width", floorWidth.ToString());
+        form.AddField("hight", floorHeight.ToString());
 
-        UnityWebRequest www = UnityWebRequest.Post(url + configEp, form);
+        UnityWebRequest www = UnityWebRequest.Post(url + initEp, form);
         yield return www.SendWebRequest();
 
         if (www.result == UnityWebRequest.Result.Success)
@@ -112,27 +116,20 @@ public class AgentController : MonoBehaviour
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
-            Debug.Log(www.error)
+            Debug.Log(www.error);
         else
             delPos = JsonUtility.FromJson<Position>(www.downloadHandler.text);
             platform = Instantiate(platformPrefab, delPos.deliveryPos , Quaternion.identity);
-        
     }
 
-    IEnumerator UpdatePositions()
+    IEnumerator UpdateModel()
     {
-        WWWForm form = new WWWForm();
-        form.AddField("numRovers", numRovers.ToString());
-
-        UnityWebRequest www = UnityWebRequest.Get(url + updateEp);
+        UnityWebRequest www = UnityWebRequest.Get(url + modelEp);
         yield return www.SendWebRequest();
 
         if (www.result == UnityWebRequest.Result.Success)
         {
             Debug.Log(www.downloadHandler.text);
-            // Extract the response into an instance of an object
-            agents = JsonUtility.FromJson<Agents>(www.downloadHandler.text);
-            MoveAgents();
         }
         else
         {
@@ -140,5 +137,29 @@ public class AgentController : MonoBehaviour
         }
     }
 
-    // Agregar move agents.
+    IEnumerator UpdatePositions()
+    {
+        UnityWebRequest www = UnityWebRequest.Get(url + positionEp);
+        yield return www.SendWebRequest();
+
+        if (www.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log(www.downloadHandler.text);
+            // Extract the response into an instance of an object
+            agents = JsonUtility.FromJson<Agents>(www.downloadHandler.text);
+            // MoveAgents();
+        }
+        else
+        {
+            Debug.Log(www.error);
+        }
+    }
+
+    // void MoveAgents()
+    // {
+    //     for (int i = 0; i < numAgents; i++)
+    //     {
+    //         cars[i].transform.position = agents.positions[i];
+    //     }
+    // }
 }

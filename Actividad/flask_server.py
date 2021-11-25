@@ -25,6 +25,7 @@ def default():
 
         print(request.form)
         model = CollectorsModel(num_rovers, num_boxes, height, width)
+        return jsonify({"Ok": num_rovers})
 
 
 @app.route("/getDelivery", methods=['GET'])
@@ -35,7 +36,7 @@ def getDelivery():
         return jsonify({'deliveryPos': model.delivery_pos})
 
 
-@app.route("/config", methods=['GET'])
+@app.route("/UpdatePositions", methods=['GET'])
 def configure():
     """Set up the simulation"""
     global model
@@ -49,7 +50,7 @@ def configure():
         return jsonify({'boxesPositions': boxes_pos, 'collectorsPositions': collecors_pos})
 
 
-@app.route("/update", methods=['GET'])
+@app.route("/updateModel", methods=['GET'])
 def update_position():
     """Create a list of 3d Points"""
     global model
