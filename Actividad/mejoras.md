@@ -1,0 +1,4 @@
+# Mejoras para la actividad
+Una de las ideas que tenemos para mejorar el programa, es **la comunicación cercana entre agentes**, donde un agente que ya carga una caja, se encuentra junto a una caja y por otro lado tiene a un agente sin caja. Esta situación activa la comunicación entre estos dos agentes, para que el agente sin caja se mueva a la posición del agente con caja en el siguiente paso, y así poder tomar la caja que no pudo levantar el otro agente.
+
+La otra idea es guardar un mapa por cad agente, donde los agentes registran sus alrededores mientras se mueven; cuando dos agentes se encuentran, estos comparten el mapeo que han hecho, generando así, un mapeo mas grande y ambos agentes utilizan esta información para realizar movimientos mas informados, conociendo la posible ubicación de cajas.
