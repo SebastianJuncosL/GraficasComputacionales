@@ -1,11 +1,12 @@
 from mesa.time import SimultaneousActivation
 from mesa.space import MultiGrid
-from mesa import Model
+from mesa import Model, model
 from agent import Delivery, Box, Collector
 
 class CollectorsModel(Model):
     def __init__(self, N, N_boxes,  height, width):
         self.num_agents = N
+        self.num_boxes = N_boxes
         self.grid = MultiGrid(width, height, torus = False) 
         self.schedule = SimultaneousActivation(self)
         self.running = True 
@@ -42,4 +43,7 @@ class CollectorsModel(Model):
     def step(self):
         self.schedule.step()
         self.num_steps += 1
+        
+        if (len(self.grid.get_cell_list_contents(self.delivery_pos)) > self.num_boxes):
+            self.running = False
 

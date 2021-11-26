@@ -52,6 +52,7 @@ public class AgentController : MonoBehaviour
         for (int i = 0; i < numRovers; i++)
         {
             rover[i] = Instantiate(roverPrefab, Vector3.zero, Quaternion.identity);
+            rover[i].transform.Rotate(-90.0f, 0.0f, 0.0f);
         }
 
         box = new GameObject[numBoxes];
@@ -84,7 +85,7 @@ public class AgentController : MonoBehaviour
         Vector3 floorScale = new Vector3(floorWidth, floorHeight, 1f);
         floor.transform.localScale = floorScale;
         // inicializa la posicion
-        floor.transform.position = new Vector3(floorWidth / 2+0.5f, 0, floorHeight/2+0.5f);
+        floor.transform.position = new Vector3(floorWidth / 2-0.5f, 0, floorHeight/2-0.5f);
 
         floor.transform.eulerAngles = new Vector3(floor.transform.eulerAngles.x + 90, floor.transform.eulerAngles.y, floor.transform.eulerAngles.z);
     }
@@ -118,6 +119,7 @@ public class AgentController : MonoBehaviour
         if (www.result != UnityWebRequest.Result.Success)
             Debug.Log(www.error);
         else
+            Debug.Log(www.downloadHandler.text);
             delPos = JsonUtility.FromJson<Position>(www.downloadHandler.text);
             platform = Instantiate(platformPrefab, delPos.deliveryPos , Quaternion.identity);
     }
@@ -163,7 +165,7 @@ public class AgentController : MonoBehaviour
         }
         for (int i = 0; i < numBoxes; i++)
         {
-            rover[i].transform.position = agents.boxesPositions[i];
+            box[i].transform.position = agents.boxesPositions[i];
         }
     }
 }

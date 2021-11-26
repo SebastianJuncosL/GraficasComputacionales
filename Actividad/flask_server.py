@@ -31,8 +31,9 @@ def default():
 @app.route("/getDelivery", methods=['GET'])
 def getDelivery():
     global model
+    (x, z) = model.delivery_pos
 
-    return jsonify({'deliveryPos': model.delivery_pos})
+    return jsonify({'deliveryPos': {"x": x, "y": 0.04, "z": z}})
 
 
 @app.route("/UpdatePositions", methods=['GET'])
@@ -41,11 +42,10 @@ def configure():
     global model
 
     if request.method == 'GET':
-        boxes_pos = [{"x": x, "y": 0, "z": z}
-                     for (a, x, z) in model.grid.coord_iter() if isinstance(a, Box)]
-        collecors_pos = [{"x": x, "y": 0, "z": z} for (
-            a, x, z) in model.grid.coord_iter() if isinstance(a, Collector)]
+        boxes_pos = [{"x": x, "y": 1.02, "z": z} for (a, x, z) in model.grid.coord_iter() for agent in a if isinstance(agent, Box)]
+        collecors_pos = [{"x": x, "y": -0.02, "z": z} for (a, x, z) in model.grid.coord_iter() for agent in a if isinstance(agent, Collector)]
 
+        print(boxes_pos, collecors_pos)
         return jsonify({'boxesPositions': boxes_pos, 'collectorsPositions': collecors_pos})
 
 
