@@ -1,6 +1,5 @@
 from mesa import Agent
 
-
 class Road(Agent):
     """
     Obstacle agent. Just to add obstacles to the grid.
@@ -56,6 +55,16 @@ class Stoplight(Agent):
             self.current = 0
             self.state = "green"
 
+class Destination(Agent):
+    """
+    Obstacle agent. Just to add obstacles to the grid.
+    """
+    def __init__(self, unique_id, model):
+        super().__init__(unique_id, model)
+
+    def step(self):
+        pass
+
 
 class Vehicle(Agent):
 
@@ -66,7 +75,7 @@ class Vehicle(Agent):
         direction: Sets next direction to advance
     """
 
-    def __init__(self, unique_id, model, pos, delivery_pos):
+    def __init__(self, unique_id, model, pos, destination_pos, direction = "up"):
         """
         Creates a new random agent.
         Args:
@@ -75,11 +84,11 @@ class Vehicle(Agent):
         """
         super().__init__(unique_id, model)
         self.pos = pos
-        self.delivery_pos = delivery_pos
-        self.box = -1
+        self.destination_pos = destination_pos
         self.impossible_steps = set()
+        self.direction = direction
 
-    def move(self):
+    def step(self):
         """ 
         Determines if the agent can move in the direction that was chosen
         """
@@ -87,36 +96,58 @@ class Vehicle(Agent):
             self.pos,
             # Boolean for whether to use Moore neighborhood (including diagonals) or Von Neumann (only up/down/left/right).
             moore=True,
-            include_center=True)
+            include_center=False)
+        
+        cell = self.model.grid.get_cell_list_contents(self.pos)[0]
+        if (isinstance(cell, Road) and cell.direction != "None"):
+            self.direction = cell.direction
 
-        # Checks which grid cells are empty
-        freeSpaces = list(map(self.model.grid.is_cell_empty, possible_steps))
+        #Check direction and quit back spaces.
+        if (self.direction == "Up"):
+            possible_steps = list(filter(lambda x : (x[1] == self.pos[1]+1), possible_steps))
+        elif (self.direction == "Down"):
+            possible_steps = list(filter(lambda x : (x[1] == self.pos[1]-1), possible_steps))
+        elif (self.direction == "Left"):
+            possible_steps = list(filter(lambda x : (x[0] == self.pos[0]-1), possible_steps))
+        else:
+            possible_steps = list(filter(lambda x : (x[0] == self.pos[0]+1), possible_steps))
+        
+        if (self.destination_pos in possible_steps):
+            print("Llegue a mi destino!")
+            self.model.grid.move_agent(self, self.destination_pos)
+            return
 
-        next_moves = [p for p, f in zip(
-            possible_steps, freeSpaces) if f == True]
 
-        next_move = self.random.choice(next_moves)
+        free_spaces = []
+        # Quit obstacles.
+        for i in range(len(possible_steps)):
+            cell_agents = self.model.grid.get_cell_list_contents(possible_steps[i])
+            for agent in cell_agents:
+                if (isinstance(agent, Road) or (isinstance(agent, Stoplight) and (agent.state == "green"))):
+                    free_spaces.append(possible_steps[i])
+        
+        if (len(free_spaces) == 0):
+            print(f"Vehicle {self.unique_id} don't move this step.")
+            return
+        
+        # Check distance.
+        min_distance = self.distance(free_spaces[0])
+        min_pos = free_spaces[0]
+
+        for pos in free_spaces:
+            distance = self.distance(pos)
+            if (distance < min_distance):
+                min_distance = distance
+                min_pos = pos
+        
         # Now move:
-        if self.random.random() < 0.1:
-            self.model.grid.move_agent(self, next_move)
-            self.steps_taken += 1
+        print(f"Se mueve de {self.pos} a {min_pos} direction", self.direction, f"y quiere ir a {self.destination_pos}" )
+        self.model.grid.move_agent(self, min_pos)
 
-        # If the cell is empty, moves the agent to that cell; otherwise, it stays at the same position
-        # if freeSpaces[self.direction]:
-        #     self.model.grid.move_agent(self, possible_steps[self.direction])
-        #     print(f"Se mueve de {self.pos} a {possible_steps[self.direction]}; direction {self.direction}")
-        # else:
-        #     print(f"No se puede mover de {self.pos} en esa direccion.")
 
-    def move(self, next_pos):
-        #print("Move Collector", self.unique_id, "to:", next_pos)
-        self.model.grid.move_agent(self, next_pos)  # Checar con servidor
-
-    def step(self):
-        """ 
-        Determines the new direction it will take, and then moves
-        """
-        # self.direction = self.random.randint(0,8)
-        # print(f"Agente: {self.unique_id} movimiento {self.direction}")
-        # self.move()
-        pass
+    # def move(self, next_pos):
+    #     #print("Move Collector", self.unique_id, "to:", next_pos)
+    #     self.model.grid.move_agent(self, next_pos)  # Checar con servidor
+    
+    def distance(self, next_pos):
+        return ((next_pos[0]-self.destination_pos[0])**2 + (next_pos[1]-self.destination_pos[1])**2)**(1/2)
