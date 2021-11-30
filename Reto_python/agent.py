@@ -63,10 +63,10 @@ class Vehicle(Agent):
     Agent that moves randomly.
     Attributes:
         unique_id: Agent's ID 
-        direction: Randomly chosen direction chosen from one of eight directions
+        direction: Sets next direction to advance
     """
 
-    def __init__(self, unique_id, model):
+    def __init__(self, unique_id, model, pos, delivery_pos):
         """
         Creates a new random agent.
         Args:
@@ -74,6 +74,10 @@ class Vehicle(Agent):
             model: Model reference for the agent
         """
         super().__init__(unique_id, model)
+        self.pos = pos
+        self.delivery_pos = delivery_pos
+        self.box = -1
+        self.impossible_steps = set()
 
     def move(self):
         """ 
@@ -103,6 +107,10 @@ class Vehicle(Agent):
         #     print(f"Se mueve de {self.pos} a {possible_steps[self.direction]}; direction {self.direction}")
         # else:
         #     print(f"No se puede mover de {self.pos} en esa direccion.")
+
+    def move(self, next_pos):
+        #print("Move Collector", self.unique_id, "to:", next_pos)
+        self.model.grid.move_agent(self, next_pos)  # Checar con servidor
 
     def step(self):
         """ 
