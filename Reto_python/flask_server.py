@@ -42,9 +42,16 @@ def updatePositions():
     if request.method == 'GET':
         vehicles_pos = [{"x": x, "y": 0, "z": z} for a, x, z in model.grid.coord_iter(
         ) for agent in a if isinstance(agent, Vehicle)]
+        return jsonify({"vehiclesPositions": vehicles_pos})
+
+
+@app.route("/updateStates", methods=['GET'])
+def updateStates():
+    global model
+    if request.method == 'GET':
         stoplights_stat = [agent.state for a, x, z in model.grid.coord_iter(
         ) for agent in a if isinstance(agent, Stoplight)]
-        return jsonify({"vehiclesPositions": vehicles_pos, "stoplightsStates": stoplights_stat})
+        return jsonify({"stoplightsStates": stoplights_stat})
 
 
 @app.route("/updateModel", methods=['GET'])
@@ -63,7 +70,11 @@ def getMap():
 
 
 # generateVehicle -> will call model that generates a new car in a random pos
-# separate stoplight and vehicle states
+
+@app.route("/generateVehicle", methods=['GET'])
+def generateVehicle():
+    global model
+    model.generateVehicle()
 
 
 if __name__ == '__main__':

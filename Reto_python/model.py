@@ -56,3 +56,6 @@ class StreetModel(Model):
     def step(self):
         '''Advance the model by one step.'''
         self.schedule.step()
+
+    def generateVehicle():
+        pass
