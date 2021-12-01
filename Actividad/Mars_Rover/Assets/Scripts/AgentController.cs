@@ -74,6 +74,7 @@ public class AgentController : MonoBehaviour
         {
             StartCoroutine(UpdateModel());
             StartCoroutine(UpdatePositions());
+            MoveAgents();
             updateTime = 0;
         }
         updateTime += Time.deltaTime;
@@ -149,7 +150,6 @@ public class AgentController : MonoBehaviour
             Debug.Log(www.downloadHandler.text);
             // Extract the response into an instance of an object
             agents = JsonUtility.FromJson<Agents>(www.downloadHandler.text);
-            MoveAgents();
         }
         else
         {
