@@ -55,5 +55,16 @@ def updateModel():
         return jsonify({"message": "Model Updated"})
 
 
+@app.route("/getMap", methods=['GET'])
+def getMap():
+    global city_map
+    if request.method == 'GET':
+        return jsonify({"updatedMap": city_map})
+
+
+# generateVehicle -> will call model that generates a new car in a random pos
+# separate stoplight and vehicle states
+
+
 if __name__ == '__main__':
     app.run(host="localhost", port=8585, debug=True)
