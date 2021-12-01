@@ -17,12 +17,14 @@ app = Flask("Traffic")
 
 def readModel():
     global city_map, width, height
+    city_map = []
     f = open("base.txt", "r")
     for line in f:
         line = line.rstrip()
         city_map.append(line)
     width = len(city_map[0])
     height = len(city_map)
+    # print(city_map)
 
 
 @app.route("/", methods=['GET'])
