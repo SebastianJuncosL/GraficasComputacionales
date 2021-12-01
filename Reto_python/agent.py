@@ -1,5 +1,6 @@
 from mesa import Agent
 
+
 class Road(Agent):
     """
     Obstacle agent. Just to add obstacles to the grid.
@@ -55,10 +56,12 @@ class Stoplight(Agent):
             self.current = 0
             self.state = "green"
 
+
 class Destination(Agent):
     """
     Obstacle agent. Just to add obstacles to the grid.
     """
+
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
 
@@ -75,7 +78,7 @@ class Vehicle(Agent):
         direction: Sets next direction to advance
     """
 
-    def __init__(self, unique_id, model, pos, destination_pos, direction = "up"):
+    def __init__(self, unique_id, model, pos, destination_pos, direction="up"):
         """
         Creates a new random agent.
         Args:
@@ -97,21 +100,25 @@ class Vehicle(Agent):
             # Boolean for whether to use Moore neighborhood (including diagonals) or Von Neumann (only up/down/left/right).
             moore=True,
             include_center=False)
-        
+
         cell = self.model.grid.get_cell_list_contents(self.pos)[0]
         if (isinstance(cell, Road) and cell.direction != "None"):
             self.direction = cell.direction
 
-        #Check direction and quit back spaces.
+        # Check direction and quit back spaces.
         if (self.direction == "Up"):
-            possible_steps = list(filter(lambda x : (x[1] == self.pos[1]+1), possible_steps))
+            possible_steps = list(
+                filter(lambda x: (x[1] == self.pos[1]+1), possible_steps))
         elif (self.direction == "Down"):
-            possible_steps = list(filter(lambda x : (x[1] == self.pos[1]-1), possible_steps))
+            possible_steps = list(
+                filter(lambda x: (x[1] == self.pos[1]-1), possible_steps))
         elif (self.direction == "Left"):
-            possible_steps = list(filter(lambda x : (x[0] == self.pos[0]-1), possible_steps))
+            possible_steps = list(
+                filter(lambda x: (x[0] == self.pos[0]-1), possible_steps))
         else:
-            possible_steps = list(filter(lambda x : (x[0] == self.pos[0]+1), possible_steps))
-        
+            possible_steps = list(
+                filter(lambda x: (x[0] == self.pos[0]+1), possible_steps))
+
         if (self.destination_pos in possible_steps):
             print("Llegue a mi destino!")
             self.model.grid.move_agent(self, self.destination_pos)
@@ -120,15 +127,16 @@ class Vehicle(Agent):
         free_spaces = []
         # Quit obstacles.
         for i in range(len(possible_steps)):
-            cell_agents = self.model.grid.get_cell_list_contents(possible_steps[i])
+            cell_agents = self.model.grid.get_cell_list_contents(
+                possible_steps[i])
             for agent in cell_agents:
                 if (isinstance(agent, Road) or (isinstance(agent, Stoplight) and (agent.state == "green"))):
                     free_spaces.append(possible_steps[i])
-        
+
         if (len(free_spaces) == 0):
             print(f"Vehicle {self.unique_id} don't move this step.")
             return
-        
+
         # Check distance.
         min_distance = self.distance(free_spaces[0])
         min_pos = free_spaces[0]
@@ -138,18 +146,18 @@ class Vehicle(Agent):
             if (distance < min_distance):
                 min_distance = distance
                 min_pos = pos
-        
+
         # Now move:
-        print(f"Se mueve de {self.pos} a {min_pos} direction", self.direction, f"y quiere ir a {self.destination_pos}" )
+        print(f"Se mueve de {self.pos} a {min_pos} direction",
+              self.direction, f"y quiere ir a {self.destination_pos}")
         self.model.grid.move_agent(self, min_pos)
 
         if (self.pos == self.destination_pos):
             self.model.running = False
 
-
     # def move(self, next_pos):
     #     #print("Move Collector", self.unique_id, "to:", next_pos)
     #     self.model.grid.move_agent(self, next_pos)  # Checar con servidor
-    
+
     def distance(self, next_pos):
         return ((next_pos[0]-self.destination_pos[0])**2 + (next_pos[1]-self.destination_pos[1])**2)**(1/2)
