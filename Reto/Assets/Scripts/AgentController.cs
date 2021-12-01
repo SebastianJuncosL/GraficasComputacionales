@@ -1,6 +1,6 @@
 ﻿// TC2008B. Sistemas Multiagentes y Gráficas Computacionales
 // C# client to interact with Python. Based on the code provided by Sergio Ruiz.
-// Octavio Navarro. October 2021
+// Octavio Navarro. October 2021 
 
 using System;
 using System.Collections;
@@ -13,6 +13,12 @@ public class CarData
 {
     public int uniqueID;
     public Vector3 position;
+    
+}
+
+public class StopLight
+{
+    public string state;
 }
 
 public class AgentData
