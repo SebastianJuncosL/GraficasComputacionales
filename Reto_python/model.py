@@ -47,7 +47,7 @@ class StreetModel(Model):
             pos = pos_gen(self.grid.width, self.grid.height)
         
         print(self.destinations)
-        a = Vehicle(2000, self, pos, self.destinations[1], self.grid.get_cell_list_contents(pos)[0].direction)
+        a = Vehicle(2000, self, pos, self.destinations[0], self.grid.get_cell_list_contents(pos)[0].direction)
         self.schedule.add(a)
         self.grid.place_agent(a, pos)
 

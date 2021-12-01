@@ -117,7 +117,6 @@ class Vehicle(Agent):
             self.model.grid.move_agent(self, self.destination_pos)
             return
 
-
         free_spaces = []
         # Quit obstacles.
         for i in range(len(possible_steps)):
@@ -143,6 +142,9 @@ class Vehicle(Agent):
         # Now move:
         print(f"Se mueve de {self.pos} a {min_pos} direction", self.direction, f"y quiere ir a {self.destination_pos}" )
         self.model.grid.move_agent(self, min_pos)
+
+        if (self.pos == self.destination_pos):
+            self.model.running = False
 
 
     # def move(self, next_pos):
