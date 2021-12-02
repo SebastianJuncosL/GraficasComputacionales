@@ -27,14 +27,14 @@ def readModel():
     # print(city_map)
 
 
-@app.route("/", methods=['GET'])
+@app.route("/", methods=['POST'])
 def default():
     global model
-    if request.method == 'GET':
+    if request.method == 'POST':
         readModel()
-        model = StreetModel()
+        N = int(request.form.get('NAgents'))
+        model = StreetModel(N)
         return jsonify({"cityMap": city_map})
-
 
 @app.route("/updatePositions", methods=['GET'])
 def updatePositions():
