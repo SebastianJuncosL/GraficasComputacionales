@@ -126,15 +126,17 @@ class Vehicle(Agent):
             print("Llegue a mi destino!")
             self.model.grid.move_agent(self, self.destination_pos)
             return
-
+        
+        if (self.pos == self.destination_pos):
+            return
+        
         free_spaces = []
         # Quit obstacles.
         for i in range(len(possible_steps)):
             cell_agents = self.model.grid.get_cell_list_contents(
                 possible_steps[i])
-            for agent in cell_agents:
-                if (isinstance(agent, Road) or (isinstance(agent, Stoplight) and (agent.state == "green"))):
-                    free_spaces.append(possible_steps[i])
+            if (len(cell_agents) == 1 and (isinstance(cell_agents[0], Road) or (isinstance(cell_agents[0], Stoplight) and (cell_agents[0].state == "green")))):
+                free_spaces.append(possible_steps[i])
 
         if (len(free_spaces) == 0):
             print(f"Vehicle {self.unique_id} don't move this step.")
@@ -154,9 +156,6 @@ class Vehicle(Agent):
         print(f"Se mueve de {self.pos} a {min_pos} direction",
               self.direction, f"y quiere ir a {self.destination_pos}")
         self.model.grid.move_agent(self, min_pos)
-
-        if (self.pos == self.destination_pos):
-            self.model.running = False
 
     # def move(self, next_pos):
     #     #print("Move Collector", self.unique_id, "to:", next_pos)

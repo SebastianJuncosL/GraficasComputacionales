@@ -54,7 +54,7 @@ with open('base.txt') as baseFile:
     width = len(lines[0])-1
     height = len(lines)
 
-model_param = {}
+model_param = {"N" : 5}
 
 canvas_element = CanvasGrid(agent_portrayal, width, height, 500, 500)
 

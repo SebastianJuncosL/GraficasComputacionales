@@ -3,12 +3,13 @@ from mesa.space import MultiGrid
 from mesa import Model
 from agent import *
 import json
-
+import random
 
 class StreetModel(Model):
-    def __init__(self):
+    def __init__(self, N):
         self.running = True
         self.num_steps = 0
+        self.num_vehicles = 0
 
         dataDictionary = json.load(open("mapDictionary.txt"))
 
@@ -40,22 +41,24 @@ class StreetModel(Model):
                         self.destinations.append((c, self.height - r - 1))
                         self.grid.place_agent(agent, (c, self.height - r - 1))
 
-        def pos_gen(w, h): return (
-            self.random.randrange(w), self.random.randrange(h))
+        for i in range(N):
 
-        pos = pos_gen(self.grid.width, self.grid.height)
-        while (not isinstance(self.grid.get_cell_list_contents(pos)[0], Road)):
-            pos = pos_gen(self.grid.width, self.grid.height)
+            self.generateVehicle()
 
-        print(self.destinations)
-        a = Vehicle(2000, self, pos, self.destinations[0], self.grid.get_cell_list_contents(
-            pos)[0].direction)
-        self.schedule.add(a)
-        self.grid.place_agent(a, pos)
 
     def step(self):
         '''Advance the model by one step.'''
         self.schedule.step()
 
-    def generateVehicle():
-        pass
+    def pos_gen(self, w, h):
+        return (self.random.randrange(w), self.random.randrange(h))
+
+    def generateVehicle(self):
+        self.num_vehicles += 1
+        pos = self.pos_gen(self.grid.width, self.grid.height)
+        while (not isinstance(self.grid.get_cell_list_contents(pos)[0], Road) or self.grid.get_cell_list_contents(pos)[0].direction == "None"):
+            pos = self.pos_gen(self.grid.width, self.grid.height)
+        
+        a = Vehicle(2000 + self.num_vehicles, self, pos, random.choice(self.destinations), self.grid.get_cell_list_contents(pos)[0].direction)
+        self.schedule.add(a)
+        self.grid.place_agent(a, pos)
