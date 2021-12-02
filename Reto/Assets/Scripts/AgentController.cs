@@ -141,12 +141,12 @@ public class AgentController : MonoBehaviour
 
     IEnumerator SendConfiguration()
     {
-        // WWWForm form = new WWWForm();
+        WWWForm form = new WWWForm();
 
-        // form.AddField("NAgents", NAgents.ToString());
+        form.AddField("NAgents", NAgents.ToString());
 
-        UnityWebRequest www = UnityWebRequest.Get(serverUrl + sendConfigEndpoint);
-        //www.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        UnityWebRequest www = UnityWebRequest.Post(serverUrl + sendConfigEndpoint, form);
+        www.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
         yield return www.SendWebRequest();
 
