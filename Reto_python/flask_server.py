@@ -60,11 +60,11 @@ def updateStates():
                 newIDs.append(newString)
             else:
                 newIDs.append(i)
-        
+
         stoplights = {}
         for i in range(len(newIDs)):
             stoplights[newIDs[i]] = stoplights_stat[i]
-        
+
         sortedStoplights = {}
         for i in sorted(stoplights.keys()):
             sortedStoplights[i] = stoplights[i]
@@ -75,7 +75,7 @@ def updateStates():
             sortedIds.append(i)
             sortedStates.append(sortedStoplights[i])
 
-        return jsonify({"ids": sortedIds, "states":sortedStates})
+        return jsonify({"ids": sortedIds, "states": sortedStates})
 
 
 @app.route("/updateModel", methods=['GET'])
