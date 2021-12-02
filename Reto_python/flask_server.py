@@ -51,7 +51,31 @@ def updateStates():
     if request.method == 'GET':
         stoplights_stat = [agent.state for a, x, z in model.grid.coord_iter(
         ) for agent in a if isinstance(agent, Stoplight)]
-        return jsonify({"stoplightsStates": stoplights_stat})
+        stoplights_id = [agent.unique_id for a, x, z in model.grid.coord_iter(
+        ) for agent in a if isinstance(agent, Stoplight)]
+        newIDs = []
+        for i in stoplights_id:
+            if len(i) <= 4:
+                newString = i[:2] + '0' + i[2:]
+                newIDs.append(newString)
+            else:
+                newIDs.append(i)
+        
+        stoplights = {}
+        for i in range(len(newIDs)):
+            stoplights[newIDs[i]] = stoplights_stat[i]
+        
+        sortedStoplights = {}
+        for i in sorted(stoplights.keys()):
+            sortedStoplights[i] = stoplights[i]
+
+        sortedIds = []
+        sortedStates = []
+        for i in sortedStoplights.keys():
+            sortedIds.append(i)
+            sortedStates.append(sortedStoplights[i])
+
+        return jsonify({"ids": sortedIds, "states":sortedStates})
 
 
 @app.route("/updateModel", methods=['GET'])
