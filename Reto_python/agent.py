@@ -92,7 +92,7 @@ class Vehicle(Agent):
         self.impossible_steps = set()
         self.direction = direction
         # stepts to take for reaching destination -> using A* search algorithm
-        self.trace = self.calculatePath()
+        #self.trace = self.calculatePath()
 
     def step(self):
         """ 

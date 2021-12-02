@@ -20,12 +20,12 @@ public class CarData
 
 public class AgentData
 {
-    public List<Vector3> positions;
+    public List<Vector3> vehiclesPositions;
 }
 
 public class LightStates
 {
-    public List<string> states;
+    public List<string> stoplightsStates;
 }
 
 public class AgentController : MonoBehaviour
@@ -41,14 +41,14 @@ public class AgentController : MonoBehaviour
     AgentData carsData, obstacleData;
     LightStates lightStates;
     GameObject[] agents;
-    GameObject[] stoplights;
+    public List<GameObject> stoplights;
     List<Vector3> oldPositions;
     List<Vector3> newPositions;
     // Pause the simulation while we get the update from the server
     bool hold = false;
 
-    public GameObject carPrefab, obstaclePrefab, floor;
-    public int NAgents, width, height;
+    public GameObject carPrefab;
+    public int NAgents;
     public float timeToUpdate = 5.0f, timer, dt;
 
 
@@ -63,8 +63,7 @@ public class AgentController : MonoBehaviour
 
         agents = new GameObject[NAgents];
 
-        floor.transform.localScale = new Vector3((float)width / 10, 1, (float)height / 10);
-        floor.transform.localPosition = new Vector3((float)width / 2 - 0.5f, 0, (float)height / 2 - 0.5f);
+
 
         timer = timeToUpdate;
 
@@ -90,14 +89,17 @@ public class AgentController : MonoBehaviour
 
         if (!hold)
         {
-            for (int s = 0; s < agents.Length; s++)
+            if (oldPositions.Count > 0)
             {
-                Vector3 interpolated = Vector3.Lerp(oldPositions[s], newPositions[s], dt);
-                agents[s].transform.localPosition = interpolated;
+                for (int s = 0; s < agents.Length; s++)
+                {
+                    Vector3 interpolated = Vector3.Lerp(oldPositions[s], newPositions[s], dt);
+                    agents[s].transform.localPosition = interpolated;
 
-                Vector3 dir = oldPositions[s] - newPositions[s];
-                agents[s].transform.rotation = Quaternion.LookRotation(dir);
+                    Vector3 dir = oldPositions[s] - newPositions[s];
+                    agents[s].transform.rotation = Quaternion.LookRotation(dir);
 
+                }
             }
             // Move time from the last frame
             timer += Time.deltaTime;
@@ -116,9 +118,9 @@ public class AgentController : MonoBehaviour
         {
             lightStates = JsonUtility.FromJson<LightStates>(www.downloadHandler.text);
 
-            for (int i = 0; i < stoplights.Length; i++)
+            for (int i = 0; i < stoplights.Count; i++)
             {
-                stoplights[i].GetComponent<StopLight>().cambiar_color(lightStates.states[i]);
+                stoplights[i].GetComponent<StopLight>().cambiar_color(lightStates.stoplightsStates[i]);
             }
         }
     }
@@ -138,14 +140,12 @@ public class AgentController : MonoBehaviour
 
     IEnumerator SendConfiguration()
     {
-        WWWForm form = new WWWForm();
+        // WWWForm form = new WWWForm();
 
-        form.AddField("NAgents", NAgents.ToString());
-        form.AddField("width", width.ToString());
-        form.AddField("height", height.ToString());
+        // form.AddField("NAgents", NAgents.ToString());
 
-        UnityWebRequest www = UnityWebRequest.Post(serverUrl + sendConfigEndpoint, form);
-        www.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        UnityWebRequest www = UnityWebRequest.Get(serverUrl + sendConfigEndpoint);
+        //www.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
         yield return www.SendWebRequest();
 
@@ -171,14 +171,16 @@ public class AgentController : MonoBehaviour
             Debug.Log(www.error);
         else
         {
+            Debug.Log(www.downloadHandler.text);
             carsData = JsonUtility.FromJson<AgentData>(www.downloadHandler.text);
 
             // Store the old positions for each agent
             oldPositions = new List<Vector3>(newPositions);
-
+            Debug.Log(oldPositions.Count);
+            Debug.Log(newPositions.Count);
             newPositions.Clear();
 
-            foreach (Vector3 v in carsData.positions)
+            foreach (Vector3 v in carsData.vehiclesPositions)
                 newPositions.Add(v);
 
             hold = false;
