@@ -9,33 +9,39 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
+
 public class CarData
 {
     public int uniqueID;
     public Vector3 position;
-    
+
 }
 
-public class StopLight
-{
-    public string state;
-}
 
 public class AgentData
 {
     public List<Vector3> positions;
 }
 
+public class LightStates
+{
+    public List<string> states;
+}
+
 public class AgentController : MonoBehaviour
 {
     // private string url = "https://boids.us-south.cf.appdomain.cloud/";
     string serverUrl = "http://localhost:8585";
-    string getAgentsEndpoint = "/getAgents";
-    string getObstaclesEndpoint = "/getObstacles";
-    string sendConfigEndpoint = "/init";
-    string updateEndpoint = "/update";
+    string getAgentsEndpoint = "/updatePositions";
+    string getStates = "/updateStates";
+    string sendConfigEndpoint = "/";
+    string updateEndpoint = "/updateModel";
+    string createVehicle = "/generateVehicle";
+
     AgentData carsData, obstacleData;
+    LightStates lightStates;
     GameObject[] agents;
+    GameObject[] stoplights;
     List<Vector3> oldPositions;
     List<Vector3> newPositions;
     // Pause the simulation while we get the update from the server
@@ -45,37 +51,41 @@ public class AgentController : MonoBehaviour
     public int NAgents, width, height;
     public float timeToUpdate = 5.0f, timer, dt;
 
+
     void Start()
     {
         carsData = new AgentData();
+        lightStates = new LightStates();
         obstacleData = new AgentData();
         oldPositions = new List<Vector3>();
         newPositions = new List<Vector3>();
 
+
         agents = new GameObject[NAgents];
 
-        floor.transform.localScale = new Vector3((float)width/10, 1, (float)height/10);
-        floor.transform.localPosition = new Vector3((float)width/2-0.5f, 0, (float)height/2-0.5f);
-        
+        floor.transform.localScale = new Vector3((float)width / 10, 1, (float)height / 10);
+        floor.transform.localPosition = new Vector3((float)width / 2 - 0.5f, 0, (float)height / 2 - 0.5f);
+
         timer = timeToUpdate;
 
-        for(int i = 0; i < NAgents; i++)
+        for (int i = 0; i < NAgents; i++)
             agents[i] = Instantiate(carPrefab, Vector3.zero, Quaternion.identity);
-            
+
         StartCoroutine(SendConfiguration());
     }
 
-    private void Update() 
+    private void Update()
     {
-        float t = timer/timeToUpdate;
+        float t = timer / timeToUpdate;
         // Smooth out the transition at start and end
-        dt = t * t * ( 3f - 2f*t);
+        dt = t * t * (3f - 2f * t);
 
-        if(timer >= timeToUpdate)
+        if (timer >= timeToUpdate)
         {
             timer = 0;
             hold = true;
             StartCoroutine(UpdateSimulation());
+            StartCoroutine(UpdateLights());
         }
 
         if (!hold)
@@ -84,24 +94,43 @@ public class AgentController : MonoBehaviour
             {
                 Vector3 interpolated = Vector3.Lerp(oldPositions[s], newPositions[s], dt);
                 agents[s].transform.localPosition = interpolated;
-                
+
                 Vector3 dir = oldPositions[s] - newPositions[s];
                 agents[s].transform.rotation = Quaternion.LookRotation(dir);
-                
+
             }
             // Move time from the last frame
             timer += Time.deltaTime;
         }
+
     }
- 
+
+    IEnumerator UpdateLights()
+    {
+        UnityWebRequest www = UnityWebRequest.Get(serverUrl + getStates);
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+            Debug.Log(www.error);
+        else
+        {
+            lightStates = JsonUtility.FromJson<LightStates>(www.downloadHandler.text);
+
+            for (int i = 0; i < stoplights.Length; i++)
+            {
+                stoplights[i].GetComponent<StopLight>().cambiar_color(lightStates.states[i]);
+            }
+        }
+    }
+
     IEnumerator UpdateSimulation()
     {
         UnityWebRequest www = UnityWebRequest.Get(serverUrl + updateEndpoint);
         yield return www.SendWebRequest();
- 
+
         if (www.result != UnityWebRequest.Result.Success)
             Debug.Log(www.error);
-        else 
+        else
         {
             StartCoroutine(GetCarsData());
         }
@@ -129,18 +158,18 @@ public class AgentController : MonoBehaviour
             Debug.Log("Configuration upload complete!");
             Debug.Log("Getting Agents positions");
             StartCoroutine(GetCarsData());
-            StartCoroutine(GetObstacleData());
+            //StartCoroutine(GetObstacleData());
         }
     }
 
-    IEnumerator GetCarsData() 
+    IEnumerator GetCarsData()
     {
         UnityWebRequest www = UnityWebRequest.Get(serverUrl + getAgentsEndpoint);
         yield return www.SendWebRequest();
- 
+
         if (www.result != UnityWebRequest.Result.Success)
             Debug.Log(www.error);
-        else 
+        else
         {
             carsData = JsonUtility.FromJson<AgentData>(www.downloadHandler.text);
 
@@ -149,30 +178,30 @@ public class AgentController : MonoBehaviour
 
             newPositions.Clear();
 
-            foreach(Vector3 v in carsData.positions)
+            foreach (Vector3 v in carsData.positions)
                 newPositions.Add(v);
 
             hold = false;
         }
     }
 
-    IEnumerator GetObstacleData() 
-    {
-        UnityWebRequest www = UnityWebRequest.Get(serverUrl + getObstaclesEndpoint);
-        yield return www.SendWebRequest();
- 
-        if (www.result != UnityWebRequest.Result.Success)
-            Debug.Log(www.error);
-        else 
-        {
-            obstacleData = JsonUtility.FromJson<AgentData>(www.downloadHandler.text);
+    //     IEnumerator GetObstacleData()
+    //     {
+    //         UnityWebRequest www = UnityWebRequest.Get(serverUrl + getObstaclesEndpoint);
+    //         yield return www.SendWebRequest();
 
-            Debug.Log(obstacleData.positions);
+    //         if (www.result != UnityWebRequest.Result.Success)
+    //             Debug.Log(www.error);
+    //         else
+    //         {
+    //             obstacleData = JsonUtility.FromJson<AgentData>(www.downloadHandler.text);
 
-            foreach(Vector3 position in obstacleData.positions)
-            {
-                Instantiate(obstaclePrefab, position, Quaternion.identity);
-            }
-        }
-    }
+    //             Debug.Log(obstacleData.positions);
+
+    //             foreach (Vector3 position in obstacleData.positions)
+    //             {
+    //                 Instantiate(obstaclePrefab, position, Quaternion.identity);
+    //             }
+    //         }
+    //     }
 }
