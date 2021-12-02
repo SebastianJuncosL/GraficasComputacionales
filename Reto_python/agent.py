@@ -1,4 +1,5 @@
 from mesa import Agent
+from collections import deque
 
 
 class Road(Agent):
@@ -90,6 +91,8 @@ class Vehicle(Agent):
         self.destination_pos = destination_pos
         self.impossible_steps = set()
         self.direction = direction
+        # stepts to take for reaching destination -> using A* search algorithm
+        self.trace = self.calculatePath()
 
     def step(self):
         """ 
@@ -161,3 +164,70 @@ class Vehicle(Agent):
 
     def distance(self, next_pos):
         return ((next_pos[0]-self.destination_pos[0])**2 + (next_pos[1]-self.destination_pos[1])**2)**(1/2)
+
+    def calculatePath(self):
+        def heuristic(i, j):
+            return abs(self.destination_pos[0] - i) + abs(self.destination_pos[1] - j)
+
+        def comp(state):
+            return state[2] + state[3]
+
+        fringe = [((self.pos[0], self.pos[1]), list(), 0,
+                   heuristic(self.pos[0], self.pos[1]))]
+        visited = {}
+        while True:
+            state = fringe.pop(0)
+            (i, j) = state[0]
+
+            (i, j) = state[0]
+            if (i, j) == self.destination_pos:
+                path = [state[0]] + state[1]
+                path.reverse()
+                return path
+
+            visited[(i, j)] = state[2]
+
+            # explore neighbors
+            neighbor = list()
+            possible_steps = self.model.grid.get_neighborhood(
+                self.pos,
+                # Boolean for whether to use Moore neighborhood (including diagonals) or Von Neumann (only up/down/left/right).
+                moore=True,
+                include_center=False)
+
+            cell = self.model.grid.get_cell_list_contents(self.pos)[0]
+            if (isinstance(cell, Road) and cell.direction != "None"):
+                self.direction = cell.direction
+
+            # Check direction and quit back spaces.
+            if (self.direction == "Up"):
+                possible_steps = list(
+                    filter(lambda x: (x[1] == self.pos[1]+1), possible_steps))
+            elif (self.direction == "Down"):
+                possible_steps = list(
+                    filter(lambda x: (x[1] == self.pos[1]-1), possible_steps))
+            elif (self.direction == "Left"):
+                possible_steps = list(
+                    filter(lambda x: (x[0] == self.pos[0]-1), possible_steps))
+            else:
+                possible_steps = list(
+                    filter(lambda x: (x[0] == self.pos[0]+1), possible_steps))
+
+            free_spaces = []
+            # Quit obstacles.
+            for i in range(len(possible_steps)):
+                cell_agents = self.model.grid.get_cell_list_contents(
+                    possible_steps[i])
+                for agent in cell_agents:
+                    if isinstance(agent, Road):
+                        free_spaces.append(possible_steps[i])
+
+            for p in free_spaces:
+                nextStep = state[2] + 1
+                if p in visited and visited[p] >= nextStep:
+                    continue
+                fringe.append((p, [state[0]] + state[1],
+                              nextStep, heuristic(p[0], p[1])))
+            fringe.sort(key=comp)
+
+        return fringe
