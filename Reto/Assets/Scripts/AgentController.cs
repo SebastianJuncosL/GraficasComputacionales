@@ -25,7 +25,8 @@ public class AgentData
 
 public class LightStates
 {
-    public List<string> stoplightsStates;
+    public List<string> ids;
+    public List<string> states;
 }
 
 public class AgentController : MonoBehaviour
@@ -120,7 +121,7 @@ public class AgentController : MonoBehaviour
 
             for (int i = 0; i < stoplights.Count; i++)
             {
-                stoplights[i].GetComponent<StopLight>().cambiar_color(lightStates.stoplightsStates[i]);
+                stoplights[i].GetComponent<StopLight>().cambiar_color(lightStates.states[i]);
             }
         }
     }
