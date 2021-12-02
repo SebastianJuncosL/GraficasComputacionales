@@ -40,9 +40,21 @@ def default():
 def updatePositions():
     global model
     if request.method == 'GET':
-        vehicles_pos = [{"x": x, "y": 0, "z": z} for a, x, z in model.grid.coord_iter(
+        vehicles_pos = [{"x": x, "y": 0.5, "z": z} for a, x, z in model.grid.coord_iter(
         ) for agent in a if isinstance(agent, Vehicle)]
-        return jsonify({"vehiclesPositions": vehicles_pos})
+        vehicles_id = [agent.unique_id for a, x, z in model.grid.coord_iter(
+        ) for agent in a if isinstance(agent, Vehicle)]
+
+        vehicles = {}
+        for i in range(len(vehicles_id)):
+            vehicles[vehicles_id[i]] = vehicles_pos[i]
+        
+        sorted_pos = []
+        for i in sorted(vehicles.keys()):
+            sorted_pos.append(vehicles[i])
+
+        return jsonify({"sortedPos" : sorted_pos})
+        # "vehiclesPositions": vehicles_pos, "vehiclesIds": vehicles_id, "sortedDict" : vehicles, 
 
 
 @app.route("/updateStates", methods=['GET'])
@@ -92,8 +104,6 @@ def getMap():
     if request.method == 'GET':
         return jsonify({"updatedMap": city_map})
 
-
-# generateVehicle -> will call model that generates a new car in a random pos
 
 @app.route("/generateVehicle", methods=['GET'])
 def generateVehicle():
