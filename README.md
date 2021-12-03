@@ -2,7 +2,8 @@
 Repo para el proyecto de Modelación de sistemas multiagentes con gráficas computacionales (TC2008B.300)
 
 [Trello](https://trello.com/invite/b/Cqs33oZX/b5004c9dae08b19a9e553c48ee6d1517/graficas-computacionales)
-\n
+
+
 [IBM Cloud Link](https://getstartedpython-cheerful-topi-qx.mybluemix.net)
 
 ## Descripción:
