@@ -6,7 +6,7 @@ import json
 import random
 
 class StreetModel(Model):
-    def __init__(self, N = 5):
+    def __init__(self, N = 20):
         self.running = True
         self.num_steps = 0
         self.num_vehicles = 0

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657815, g: 0.49641192, b: 0.57481617, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -199,13 +199,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 136675311}
-  m_LocalRotation: {x: 0.42261827, y: 0, z: 0, w: 0.9063079}
-  m_LocalPosition: {x: 12, y: 10, z: -1.5}
+  m_LocalRotation: {x: 0.5203386, y: 0.012754171, z: -0.017467076, w: 0.85368615}
+  m_LocalPosition: {x: 12.4, y: 16.61, z: 0.31}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 50, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 62.73, y: 0.45, z: -2.07}
 --- !u!1 &395527429
 GameObject:
   m_ObjectHideFlags: 0
@@ -439,9 +439,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stoplights: []
-  carPrefab: {fileID: 704267633704702948, guid: 9757e23be751cd341ba939f2c4592363, type: 3}
-  NAgents: 1
-  timeToUpdate: 5
+  carPrefab:
+  - {fileID: 4169955437925796512, guid: 3028f13698a50cb48916d2ab285671c0, type: 3}
+  - {fileID: 3512752004990249426, guid: 489b47bcc0026954d85d3f4b258e9ca3, type: 3}
+  - {fileID: 8190131527347712381, guid: ff6edc93e76d28747af7f83357589400, type: 3}
+  - {fileID: 2597634259611651361, guid: 5f1bb9b2cfa6d394a9a329fd754d740e, type: 3}
+  NAgents: 20
+  timeToUpdate: 1
   timer: 0
   dt: 0
 --- !u!4 &1998529224
@@ -458,60 +462,3 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &5649753937202476739
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1760276940916172359, guid: 5fc619b461fa64d3fa9a9a464b00f377, type: 3}
-      propertyPath: m_Name
-      value: Plane
-      objectReference: {fileID: 0}
-    - target: {fileID: 8985388821698144899, guid: 5fc619b461fa64d3fa9a9a464b00f377, type: 3}
-      propertyPath: m_RootOrder
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8985388821698144899, guid: 5fc619b461fa64d3fa9a9a464b00f377, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8985388821698144899, guid: 5fc619b461fa64d3fa9a9a464b00f377, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8985388821698144899, guid: 5fc619b461fa64d3fa9a9a464b00f377, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8985388821698144899, guid: 5fc619b461fa64d3fa9a9a464b00f377, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8985388821698144899, guid: 5fc619b461fa64d3fa9a9a464b00f377, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8985388821698144899, guid: 5fc619b461fa64d3fa9a9a464b00f377, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8985388821698144899, guid: 5fc619b461fa64d3fa9a9a464b00f377, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8985388821698144899, guid: 5fc619b461fa64d3fa9a9a464b00f377, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8985388821698144899, guid: 5fc619b461fa64d3fa9a9a464b00f377, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8985388821698144899, guid: 5fc619b461fa64d3fa9a9a464b00f377, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 5fc619b461fa64d3fa9a9a464b00f377, type: 3}

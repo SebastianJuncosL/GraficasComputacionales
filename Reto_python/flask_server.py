@@ -53,7 +53,7 @@ def updatePositions():
         for i in sorted(vehicles.keys()):
             sorted_pos.append(vehicles[i])
 
-        return jsonify({"sortedPos" : sorted_pos})
+        return jsonify({"vehiclesPositions" : sorted_pos})
         # "vehiclesPositions": vehicles_pos, "vehiclesIds": vehicles_id, "sortedDict" : vehicles, 
 
 

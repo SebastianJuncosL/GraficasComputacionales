@@ -1,8 +1,8 @@
-﻿// TC2008B. Sistemas Multiagentes y Gráficas Computacionales
+// TC2008B. Sistemas Multiagentes y Gráficas Computacionales
 // C# client to interact with Python. Based on the code provided by Sergio Ruiz.
 // Octavio Navarro. October 2021 
 
-using System;
+//using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -32,7 +32,8 @@ public class LightStates
 public class AgentController : MonoBehaviour
 {
     // private string url = "https://boids.us-south.cf.appdomain.cloud/";
-    string serverUrl = "http://localhost:8585";
+    //string serverUrl = "http://localhost:8585";
+    string serverUrl = "https://getstartedpython-cheerful-topi-qx.mybluemix.net";
     string getAgentsEndpoint = "/updatePositions";
     string getStates = "/updateStates";
     string sendConfigEndpoint = "/";
@@ -48,10 +49,13 @@ public class AgentController : MonoBehaviour
     // Pause the simulation while we get the update from the server
     bool hold = false;
 
-    public GameObject carPrefab;
+   public GameObject[] carPrefab;
+ 
+
     public int NAgents;
     public float timeToUpdate = 5.0f, timer, dt;
 
+  
 
     void Start()
     {
@@ -62,15 +66,20 @@ public class AgentController : MonoBehaviour
         newPositions = new List<Vector3>();
 
 
+
         agents = new GameObject[NAgents];
+
 
 
 
         timer = timeToUpdate;
 
         for (int i = 0; i < NAgents; i++)
-            agents[i] = Instantiate(carPrefab, Vector3.zero, Quaternion.identity);
+        {
+            var randomIndex = Random.Range(0, carPrefab.Length);
+            agents[i] = Instantiate(carPrefab[randomIndex], Vector3.zero, Quaternion.identity);
 
+        }
         StartCoroutine(SendConfiguration());
     }
 
@@ -98,6 +107,7 @@ public class AgentController : MonoBehaviour
                     agents[s].transform.localPosition = interpolated;
 
                     Vector3 dir = oldPositions[s] - newPositions[s];
+
                     agents[s].transform.rotation = Quaternion.LookRotation(dir);
 
                 }
