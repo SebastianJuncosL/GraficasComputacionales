@@ -1,0 +1,5 @@
+---
+applications:
+  - name: TrafficAgents
+    random-route : true
+    memory: 128M

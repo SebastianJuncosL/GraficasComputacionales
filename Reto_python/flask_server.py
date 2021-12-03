@@ -1,6 +1,7 @@
 from os import read
 from flask import Flask, request, jsonify
 from model import *
+import os
 
 # Create the flask service
 
@@ -13,6 +14,8 @@ height = 10
 model = None
 
 app = Flask("Traffic")
+
+port = int(os.getenv('PORT', 8500))
 
 
 def readModel():
@@ -36,6 +39,7 @@ def default():
         model = StreetModel(N)
         return jsonify({"cityMap": city_map})
 
+
 @app.route("/updatePositions", methods=['GET'])
 def updatePositions():
     global model
@@ -48,13 +52,13 @@ def updatePositions():
         vehicles = {}
         for i in range(len(vehicles_id)):
             vehicles[vehicles_id[i]] = vehicles_pos[i]
-        
+
         sorted_pos = []
         for i in sorted(vehicles.keys()):
             sorted_pos.append(vehicles[i])
 
-        return jsonify({"vehiclesPositions" : sorted_pos})
-        # "vehiclesPositions": vehicles_pos, "vehiclesIds": vehicles_id, "sortedDict" : vehicles, 
+        return jsonify({"sortedPos": sorted_pos})
+        # "vehiclesPositions": vehicles_pos, "vehiclesIds": vehicles_id, "sortedDict" : vehicles,
 
 
 @app.route("/updateStates", methods=['GET'])
@@ -112,4 +116,4 @@ def generateVehicle():
 
 
 if __name__ == '__main__':
-    app.run(host="localhost", port=8585, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=True)
